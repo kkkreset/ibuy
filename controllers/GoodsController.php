@@ -15,6 +15,14 @@ class GoodsController extends BaseController{
 	 * 
 	**/ 
 	public function actionList() {
+		$dataObj = isset($this->jData)?$this->jData:'';
+		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
+		$page = isset($dataObj->page)?$dataObj->page: 1;
+		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
+
+		$list = AmcProduct::findAll($condition, $page, $pageSize);
+		$dataArr['nextPageNo'] = F::pages($list['count']->cnt, $page, $pageSize);
+		$dataArr['totalPages'] = $list['count']->cnt;
 		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
 	}
 }

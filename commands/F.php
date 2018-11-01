@@ -14,8 +14,6 @@ use Lcobucci\JWT\Signature;
 
 use yii\web\Session;
 
-use app\commands\Consts;
-
 class F {
     
     /**
