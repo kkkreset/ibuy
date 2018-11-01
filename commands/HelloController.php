@@ -18,8 +18,7 @@ use yii\console\ExitCode;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class HelloController extends Controller
-{
+class HelloController extends Controller {
     /**
      * This command echoes what you have entered as the message.
      * @param string $message the message to be echoed.
