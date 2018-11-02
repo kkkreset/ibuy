@@ -91,4 +91,9 @@ class AmcUser extends \yii\db\ActiveRecord
             'avatar' => 'Avatar',
         ];
     }
+
+
+    public static function findByPhone($phone){
+        return AmcUser::find()->where(['phone'=>$phone, 'status'=>1])->one();
+    }
 }

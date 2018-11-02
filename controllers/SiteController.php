@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -32,7 +31,7 @@ class SiteController extends Controller{
         $code = isset($json->data->code)?$json->data->code:'';
         $invite = isset($json->data->invite)?$json->data->invite:'';
         if(!$phone || !$code)
-            return F::buildJsonData(1, Consts::msgInfo(10020));
+            return F::buildJsonData(10020, Consts::msgInfo(10020));
         if($code == '1234') {
             $userObj = AmcUser::find()->where(['phone'=>$phone])->one();
             $token = F::setToken('phone', $phone, 3600 * 24 * 7);// Token时效设置
@@ -44,13 +43,13 @@ class SiteController extends Controller{
                 $userObj->referralnum = $invite;
                 // $userObj->avatar = 'user/default-'.rand(1,5).'.png'; //设置默认头像
                 $userObj->avatar = '';
-                $userObj->token = ''.$token;
-                if($userObj->validate()){
-                    if($userObj->errors) {
-                        return F::buildJsonData(1,$userObj->errors);
-                    }
-                    $userObj->save();
+            }
+            $userObj->token = ''.$token;
+            if($userObj->validate()){
+                if($userObj->errors) {
+                    return F::buildJsonData(1, $userObj->errors);
                 }
+                $userObj->save();
             }
             return F::buildJsonData(0, Consts::msgInfo(), ['access_token'=>''.$token]);
         }

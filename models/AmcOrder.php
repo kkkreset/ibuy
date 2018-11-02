@@ -38,6 +38,11 @@ class AmcOrder extends \yii\db\ActiveRecord
         return 'amc_order';
     }
 
+    public static function tableNameExp($exp)
+    {
+        return 'amc_order '.$exp;
+    }
+
     /**
      * @inheritdoc
      */
@@ -81,5 +86,32 @@ class AmcOrder extends \yii\db\ActiveRecord
             'pay_time' => 'Pay Time',
             'addtime' => 'Addtime',
         ];
+    }
+
+    public static function findAll($condition=[], $page=1, $pagesize=10) {
+        $query = AmcOrder::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        foreach ($condition as $k => $v) {
+            if($v) {
+                switch ($k) {
+                    case 'ocode':
+                        $query->andWhere(['like','ocode',$v]);
+                        break;
+                    case 'status':
+                        $query->andWhere('status = '.$v);
+                        break;
+                }
+            }
+        }
+        $count = $query->count();
+        $query->orderBy('t.id desc');
+        if($page <= 1) {
+            $limit = ' LIMIT 0,'.$pagesize;
+        }else{
+            $limit = ' LIMIT '.(($page - 1) * $pagesize).','.$pagesize;
+        }
+        $data = $query->all();
+        return compact('count', 'data');
     }
 }

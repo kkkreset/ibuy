@@ -343,6 +343,7 @@ class F {
                         ->setIssuedAt(time()) // 生成时间
                         ->setExpiration(time() + $expiration) // 过期时间
                         ->set($key, $val)
+                        ->setHeader('alg','HS256')
                         ->getToken(); // 检索生成的令牌
         return $token; // 返回令牌
     }
@@ -358,8 +359,8 @@ class F {
 
     public static function ValidationJWT($tokenObj) {
         $data = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
-        $data->setIssuer(XY_ISSUER);
-        $data->setAudience(XY_AUDIENCE);
+        $data->setIssuer(JWT_ISSUER);
+        $data->setAudience(JWT_AUDIENCE);
 
         // $data->setCurrentTime(time() + 4000); //使Token过期
  
