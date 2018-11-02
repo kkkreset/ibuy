@@ -197,7 +197,7 @@ class UserController extends Controller{
            	$addr = AmcAddress::find()->where(['id'=>$id])->one();
            	F::buildJsonData(0, Consts::msgInfo(),$addr);
     	}else if($type == 2){
-    		$addrs = AmcAddress::find()->where(['uid'=>$userObj->id])->select();
+    		$addrs = AmcAddress::find()->where(['uid'=>$userObj->id])->all();
     		F::buildJsonData(0, Consts::msgInfo(),$addrs);
     	}else{
     		F::buildJsonData(1, Consts::msgInfo(10010));
