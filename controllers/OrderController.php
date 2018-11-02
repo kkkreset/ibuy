@@ -15,9 +15,9 @@ class OrderController extends BaseController{
 		$dataObj = isset($this->jData)?$this->jData:'';
 		$page = isset($dataObj->page)?$dataObj->page: 1;
 		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
-		$status = isset($dataObj->status)?$dataObj->status: 0;
+		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
 
-		$list = AmcOrder::findAll(['uid'=>$this->user->id,'status'=>$status], $page, $pagesize);
+		$list = AmcOrder::findAll(['uid'=>$this->user->id,'condition'=>$condition], $page, $pagesize);
 		$dataArr = F::newModelToArr($list['data']);
 
 		$dataArr['nextPageNo'] = F::pages($list['count'], $page, $pageSize);
@@ -26,11 +26,18 @@ class OrderController extends BaseController{
 		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
 	}
 
-	public function actionOrder() {
-		$phone = $this->token->getClaim('phone');
-        if(!$phone || $phone == ''){
-            return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
-        }
+	public function actionInfo() {
+		$dataObj = isset($this->jData)?$this->jData:'';
+		$id = isset($dataObj->id)?$dataObj->id:0;
+		$ocode = isset($dataObj->ocode)?$dataObj->ocode:'';
+		
+		if(!$id && !$ocode) 
+			return F::buildJsonData(4, Consts::msgInfo(4));
 
+		$order = AmcOrder::findByOrder($id, $ocode);
+		if($order->attributes) {
+			return F::buildJsonData(0, Consts::msgInfo(), $order->attributes);
+		}
+		return F::buildJsonData(0, Consts::msgInfo());
 	}
 }

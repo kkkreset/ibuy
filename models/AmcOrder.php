@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\commands\F;
 
 /**
  * This is the model class for table "amc_order".
@@ -50,7 +51,7 @@ class AmcOrder extends \yii\db\ActiveRecord
     {
         return [
             [['ocode', 'uid', 'pid'], 'required'],
-            [['uid', 'pid', 'shop_id', 'address_id'], 'integer'],
+            [['uid', 'pid', 'shop_id', 'address_id','status'], 'integer'],
             [['mprice', 'pay_hd', 'pay_price', 'price'], 'number'],
             [['pay_time', 'addtime'], 'safe'],
             [['ocode', 'pname', 'phone', 'province', 'city', 'county'], 'string', 'max' => 50],
@@ -83,6 +84,7 @@ class AmcOrder extends \yii\db\ActiveRecord
             'city' => 'City',
             'county' => 'County',
             'address' => 'Address',
+            'status' => 'status',
             'pay_time' => 'Pay Time',
             'addtime' => 'Addtime',
         ];
@@ -92,14 +94,15 @@ class AmcOrder extends \yii\db\ActiveRecord
         $query = AmcOrder::find();
         $query->from(self::tableNameExp('t'));
         $query->select('t.*');
-        foreach ($condition as $k => $v) {
+        $query->where('uid = '. $condition['uid']);
+        if($condition['status'] != 0) {
+            $query->andWhere('status ='.$condition['uid']);
+        }
+        foreach ($condition['condition'] as $k => $v) {
             if($v) {
                 switch ($k) {
                     case 'ocode':
                         $query->andWhere(['like','ocode',$v]);
-                        break;
-                    case 'status':
-                        $query->andWhere('status = '.$v);
                         break;
                 }
             }
@@ -113,5 +116,13 @@ class AmcOrder extends \yii\db\ActiveRecord
         }
         $data = $query->all();
         return compact('count', 'data');
+    }
+
+    public static function findByOrder($id, $ocode) {
+        $query = AmcOrder::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->andWhere('id = '.F::q($id).' or ocode ='.F::q($ocode));
+        return $query->one();
     }
 }
