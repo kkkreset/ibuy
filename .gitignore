@@ -35,4 +35,4 @@ tests/_support/_generated
 #config db web params
 config/db.php
 config/web.php
-config/param.php
+config/params.php
