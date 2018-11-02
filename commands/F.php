@@ -371,7 +371,8 @@ class F {
             $paramsdata = '{}';
         }
         $data = ['code'=>$code,'msg'=>$msg, 'data'=>$paramsdata];
-        return json_encode($data);
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return $data;
     }
 
     public static function pages($cnt, $page, $pagesize) {
