@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\commands\F;
 
 /**
  * This is the model class for table "amc_product".
@@ -37,13 +38,17 @@ class AmcProduct extends \yii\db\ActiveRecord
         return 'amc_product';
     }
 
+    public static function tableNameExp($exp){
+        return 'amc_product '.$exp;
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['title', 'level', 'category_id', 'img'], 'required'],
+            [['title', 'level', 'category_id', 'img', 'sku'], 'required'],
             [['level', 'category_id', 'f_shop_id', 'shop_id', 'storage'], 'integer'],
             [['price', 'r_price', 'hd_price', 'm_price'], 'number'],
             [['desc'], 'string'],
@@ -57,12 +62,12 @@ class AmcProduct extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'title' => '产品名',
             'title_c' => '产品副标题',
+            'sku'=>'商品编码',
             'level' => '产品商城属性',
             'level_title' => 'Level Title',
             'category_id' => '分类ID',
@@ -81,19 +86,21 @@ class AmcProduct extends \yii\db\ActiveRecord
             'is_hot' => '是否热门0不热1热门',
         ];
     }
+    private static $productIF = ['is_del'=>0,'is_shelf'=>1,'is_pass'=>1,'is_view'=>1];
 
     public static function findAll($condition=[], $page=1, $pagesize=10) {
         $query = AmcProduct::find();
-        $query->from('amc_product t');
+        $query->from(self::tableNameExp('t'));
         $query->select('t.*');
+        $query->where(self::$productIF);
         foreach ($condition as $k => $v) {
             if($v) {
-                switch ($K) {
+                switch ($k) {
                     case 'title':
-                        $query->andWhere(['like','title'],$v);
+                        $query->andWhere(['like','title',$v]);
                         break;
                     default:
-                        $query->andWhere(['like','title'],$v);
+                        $query->andWhere(['like','title',$v]);
                         break;
                 }
             }
@@ -107,5 +114,23 @@ class AmcProduct extends \yii\db\ActiveRecord
         }
         $data = $query->all();
         return compact('count', 'data');
+    }
+
+    public static function findById($id) {
+        $query = AmcProduct::find();
+        $query->from(tableNameExp('t'));
+        $query->select('t.*');
+        $query->where($this->productIF);
+        $query->andWhere('id ='.$id);
+        return $query->one();
+    }
+
+    public static function findByProduct($id, $sku) {
+        $query = AmcProduct::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->where(self::$productIF);
+        $query->andWhere('id = '.F::q($id).' or sku ='.F::q($sku));
+        return $query->one();
     }
 }

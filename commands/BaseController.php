@@ -28,7 +28,7 @@ class BaseController extends Controller {
     public function beforeAction($action) {
         $postData =  isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
         if(!$postData) {
-            echo F::buildJsonData(1, Consts::msgInfo(3));exit;
+            return F::buildJsonData(1, Consts::msgInfo(3));exit;
         }
         $this->json = json_decode($postData);
         if($action->id != 'signin') {

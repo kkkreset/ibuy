@@ -338,8 +338,8 @@ class F {
     }
 
     public static function setToken($key, $val, $expiration=3600) {
-        $token = (new Builder())->setIssuer(XY_ISSUER) // 签发者
-                        ->setAudience(XY_AUDIENCE) // 接收jwt的一方
+        $token = (new Builder())->setIssuer(JWT_ISSUER) // 签发者
+                        ->setAudience(JWT_AUDIENCE) // 接收jwt的一方
                         ->setIssuedAt(time()) // 生成时间
                         ->setExpiration(time() + $expiration) // 过期时间
                         ->set($key, $val)
@@ -524,9 +524,8 @@ class F {
     }
 
     public static function parsingTokenParams($token, $key) {
-        if(!$token) {
+        if(!$token) 
             return false;
-        }
         if($token->getClaim($key)) {
             return $token->getClaim($key);
         }
@@ -596,7 +595,6 @@ class F {
     public static function assert($val, $msg) {
         if(!$val) 
             return F::buildJsonData(1, Consts::msgInfo($msg), $dataArr);
-
     }
 
     

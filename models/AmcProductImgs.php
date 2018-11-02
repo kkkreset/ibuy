@@ -28,8 +28,8 @@ class AmcProductImgs extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['p_id', 'img'], 'required'],
-            [['p_id'], 'integer'],
+            [['pid', 'img'], 'required'],
+            [['pid'], 'integer'],
             [['img'], 'string', 'max' => 100],
             [['is_del'], 'string', 'max' => 1],
         ];
@@ -47,4 +47,8 @@ class AmcProductImgs extends \yii\db\ActiveRecord
             'is_del' => 'Is Del',
         ];
     }
+
+    public static function findAllByPid($pid) {
+        return AmcProductImgs::find()->where(['pid'=>$pid,'is_del'=>0])->orderBy('id asc')->all();
+    } 
 }

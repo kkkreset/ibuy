@@ -27,8 +27,7 @@ class SiteController extends Controller{
      *
      **/
     public function actionLogin() {
-        $postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
-        $json = json_decode($postData);
+        $json = F::parsingPost();
         $phone = isset($json->data->phone)?$json->data->phone:'';
         $code = isset($json->data->code)?$json->data->code:'';
         $invite = isset($json->data->invite)?$json->data->invite:'';
