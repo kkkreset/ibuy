@@ -82,34 +82,30 @@ class AmcProduct extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     * @return AmcProductQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new AmcProductQuery(get_called_class());
-    }
-
-
-    public $cnt, $brand_title, $gear_title, $orderCnt;
-    public $is_collect = 0;
-    public $goods_pic;
-    public static function findAll($condition=array(), $page=1, $pagesize=10) {
-        $select = 't.*'
-        $sql = "SELECT {$select} FROM amc_product t";
-        $sqlCount = "SELECT count(t.id) as cnt FROM amc_product t";
-        $where = '';
-       
-        $order = ' ORDER BY t.id DESC ';
-        $count = AmcProduct::findBySql($sqlCount.$join.$where)->one();
-        
+    public static function findAll($condition=[], $page=1, $pagesize=10) {
+        $query = AmcProduct::find();
+        $query->from('amc_product t');
+        $query->select('t.*');
+        foreach ($condition as $k => $v) {
+            if($v) {
+                switch ($K) {
+                    case 'title':
+                        $query->andWhere(['like','title'],$v);
+                        break;
+                    default:
+                        $query->andWhere(['like','title'],$v);
+                        break;
+                }
+            }
+        }
+        $count = $query->count();
+        $query->orderBy('id desc');
         if($page <= 1) {
             $limit = ' LIMIT 0,'.$pagesize;
         }else{
             $limit = ' LIMIT '.(($page - 1) * $pagesize).','.$pagesize;
         }
-        $data = AmcProduct::findBySql($sql.$join.$where.$order.$limit)->all();
+        $data = $query->all();
         return compact('count', 'data');
     }
 }

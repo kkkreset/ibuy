@@ -14,9 +14,9 @@ class SiteController extends Controller{
 
     public $layout = false;
 
-    // public function actionError() {
-    //     return $this->render('error');
-    // }
+    public function actionError() {
+        return $this->render('error');
+    }
 
     public function actionIndex() {
         return $this->render('index');
@@ -37,18 +37,23 @@ class SiteController extends Controller{
         if($code == '1234') {
             $userObj = AmcUser::find()->where(['phone'=>$phone])->one();
             $token = F::setToken('phone', $phone, 3600 * 24 * 7);// Token时效设置
-            var_dump(''.$token);
             if(!$userObj) {
                 $userObj = new AmcUser();
                 $userObj->phone = $phone;
                 $userObj->password = md5(md5('123456'));
+                $userObj->status = 1;
+                $userObj->referralnum = $invite;
                 // $userObj->avatar = 'user/default-'.rand(1,5).'.png'; //设置默认头像
                 $userObj->avatar = '';
+                $userObj->token = ''.$token;
+                if($userObj->validate()){
+                    if($userObj->errors) {
+                        return F::buildJsonData(1,$userObj->errors);
+                    }
+                    $userObj->save();
+                }
             }
-            var_dump($userObj);
-            if($userObj->save()) {
-                return F::buildJsonData(0, Consts::msgInfo(), ['access_token'=>''.$token]);
-            }
+            return F::buildJsonData(0, Consts::msgInfo(), ['access_token'=>''.$token]);
         }
         return F::buildJsonData(1, Consts::msgInfo(30001));
     }

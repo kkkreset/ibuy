@@ -6,6 +6,7 @@ use Yii;
 use yii\db\Expression;
 use app\commands\BaseController;
 use app\commands\F;
+use app\commands\Consts;
 use app\models\AmcProduct;
 
 class GoodsController extends BaseController{
@@ -21,8 +22,16 @@ class GoodsController extends BaseController{
 		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
 
 		$list = AmcProduct::findAll($condition, $page, $pageSize);
-		$dataArr['nextPageNo'] = F::pages($list['count']->cnt, $page, $pageSize);
-		$dataArr['totalPages'] = $list['count']->cnt;
+		$dataArr = [];
+		foreach ($list['data'] as $i => $r) {
+			foreach ($r as $k => $v) {
+				$v = isset($v)?$v:'';
+				$dataArr['allData'][$i][$k] = $v;
+			}
+		}
+
+		$dataArr['nextPageNo'] = F::pages($list['count'], $page, $pageSize);
+		$dataArr['totalPages'] = $list['count'];
 		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
 	}
 }

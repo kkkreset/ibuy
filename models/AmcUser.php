@@ -7,28 +7,29 @@ use Yii;
 /**
  * This is the model class for table "amc_user".
  *
- * @property int 	$id
- * @property string $phone 账号手机号
+ * @property int $id
+ * @property string $phone 手机号/账号
  * @property string $password 密码
  * @property string $name 姓名
- * @property int 	$status 状态 1 使用 2 暂停使用
+ * @property int $status 状态 1 使用 2 暂停使用
  * @property string $createtime 注册时间
  * @property string $remark 备注
- * @property int 	$money 现金券
- * @property int 	$hdlock 待用hd
- * @property int 	$hdcirculate 可用hd
- * @property int 	$amclock 待用amc
- * @property int 	$amccirculate 可用amc
- * @property int 	$eth 
- * @property int 	$btc 
- * @property int 	$referrallevel 层级
+ * @property string $money 现金券
+ * @property string $hdlock 待用hd
+ * @property string $hdcirculate 可用hd
+ * @property string $amclock 待用amc
+ * @property string $amccirculate 可用amc
+ * @property string $eth
+ * @property string $btc
+ * @property int $referrallevel 层级
  * @property string $groupnum 组号(用户id)
- * @property int 	$reccount 发展人数
+ * @property int $reccount 发展人数
  * @property string $referralnum 邀请码(会员phone)
- * @property int 	$uploadpermission 上传应用商城商品权限 1 不可以 2 可以
+ * @property int $uploadpermission 上传应用商城商品权限 1 不可以 2 可以
  * @property string $cardnum 身份证
- * @property int	$isreal 是否实名 1 不是 2 是
+ * @property int $isreal 是否实名 1 不是 2 是
  * @property string $permission 权限
+ * @property string $avatar 头像
  */
 class AmcUser extends \yii\db\ActiveRecord
 {
@@ -46,13 +47,16 @@ class AmcUser extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id','phone','password','createtime','groupnum'], 'required'],
-            [['id', 'status', 'referrallevel', 'reccount', 'uploadpermission', 'isreal'], 'integer'],
+            [['phone', 'password'], 'required'],
+            [['status', 'referrallevel', 'reccount', 'uploadpermission', 'isreal'], 'integer'],
+            [['createtime'], 'safe'],
             [['money', 'hdlock', 'hdcirculate', 'amclock', 'amccirculate', 'eth', 'btc'], 'number'],
-            [['phone', 'name', 'createtime', 'groupnum', 'referralnum'], 'string', 'max' => 12],
-            [['cardnum'], 'string', 'max' => 18],
+            [['phone', 'name', 'groupnum', 'referralnum'], 'string', 'max' => 12],
+            [[ 'cardnum'], 'string', 'max' => 18],
+            [['password'], 'string', 'max' => 50],
             [['remark', 'permission'], 'string', 'max' => 200],
-            [['id'], 'unique'],
+            [['avatar'], 'string', 'max' => 100],
+            [['phone','password','token','referralnum','avatar'],'safe']
         ];
     }
 
@@ -81,9 +85,10 @@ class AmcUser extends \yii\db\ActiveRecord
             'reccount' => 'Reccount',
             'referralnum' => 'Referralnum',
             'uploadpermission' => 'Uploadpermission',
-            'cardnum ' => 'Cardnum ',
+            'cardnum' => 'Cardnum',
             'isreal' => 'Isreal',
             'permission' => 'Permission',
+            'avatar' => 'Avatar',
         ];
     }
 }
