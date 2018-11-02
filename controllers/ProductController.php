@@ -2,23 +2,22 @@
 
 namespace app\controllers;
 
-use Yii;
-use yii\db\Expression;
-use app\commands\BaseController;
+use yii\web\Controller;
 use app\commands\F;
 use app\commands\Consts;
 use app\models\AmcProduct;
 use app\models\AmcProductImgs;
 
 
-class ProductController extends BaseController{
+class ProductController extends Controller{
 
 	/**
 	 * 商品列表 & 搜索 
 	 * 
 	**/ 
 	public function actionList() {
-		$dataObj = isset($this->jData)?$this->jData:'';
+		$json = F::parsingPost();
+		$dataObj = isset($json->jData)?$json->jData:'';
 		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
 		$page = isset($dataObj->page)?$dataObj->page: 1;
 		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
@@ -32,7 +31,8 @@ class ProductController extends BaseController{
 	}
 
 	public function actionInfo() {
-		$dataObj = isset($this->jData)?$this->jData:'';
+		$json = F::parsingPost();
+		$dataObj = isset($json->jData)?$json->jData:'';
 		$id = isset($dataObj->id)?$dataObj->id:0;
 		$sku = isset($dataObj->sku)?$dataObj->sku:'';
 

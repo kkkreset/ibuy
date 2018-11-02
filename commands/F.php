@@ -343,6 +343,7 @@ class F {
                         ->setIssuedAt(time()) // 生成时间
                         ->setExpiration(time() + $expiration) // 过期时间
                         ->set($key, $val)
+                        ->setHeader('alg','HS256')
                         ->getToken(); // 检索生成的令牌
         return $token; // 返回令牌
     }
