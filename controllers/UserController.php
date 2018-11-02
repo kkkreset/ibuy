@@ -47,7 +47,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		return F::buildJsonData(0, Consts::msgInfo(),$return['msg']);
+    		return F::buildJsonData(0, Consts::msgInfo(),$return['msg']->toArray());
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -61,7 +61,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -85,7 +85,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -116,7 +116,7 @@ class UserController extends Controller{
         $json = json_decode($postData);
         $return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -148,7 +148,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -185,7 +185,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -213,7 +213,7 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		$userObj = (object)$return['msg'];
+    		$userObj = $return['msg'];
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
