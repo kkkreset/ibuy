@@ -118,9 +118,9 @@ class AmcProduct extends \yii\db\ActiveRecord
 
     public static function findById($id) {
         $query = AmcProduct::find();
-        $query->from(tableNameExp('t'));
+        $query->from(self::tableNameExp('t'));
         $query->select('t.*');
-        $query->where($this->productIF);
+        $query->where(self::$productIF);
         $query->andWhere('id ='.$id);
         return $query->one();
     }

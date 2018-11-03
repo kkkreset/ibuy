@@ -54,9 +54,10 @@ class AmcOrder extends \yii\db\ActiveRecord
             [['uid', 'pid', 'shop_id', 'address_id','status'], 'integer'],
             [['mprice', 'pay_hd', 'pay_price', 'price'], 'number'],
             [['pay_time', 'addtime'], 'safe'],
-            [['ocode', 'pname', 'phone', 'province', 'city', 'county'], 'string', 'max' => 50],
-            [['ptitle', 'pimg'], 'string', 'max' => 100],
-            [['address'], 'string', 'max' => 200],
+            // [['ocode', 'pname', 'phone', 'province', 'city', 'county','zipcode'], 'string', 'max' => 50],
+            // [['ptitle', 'pimg'], 'string', 'max' => 100],
+            // [['address'], 'string', 'max' => 200],
+            [['ocode','uid','pid','address_id','status','province', 'city', 'county','zipcode', 'address','pay_hd', 'pay_price'],'safe']
         ];
     }
 
@@ -79,6 +80,7 @@ class AmcOrder extends \yii\db\ActiveRecord
             'price' => 'Price',
             'address_id' => 'Address ID',
             'pname' => 'Pname',
+            'zipcode'=>'zipcode',
             'phone' => 'Phone',
             'province' => 'Province',
             'city' => 'City',

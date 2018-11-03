@@ -524,6 +524,28 @@ class F {
         return $dataArr;
     }
 
+    public static function objectModelToArr($modelArr) {        
+        $dataArr = [];
+        foreach($modelArr as $index=>$val) {
+            switch(gettype($val)) {
+                case 'string':
+                    $newVal = isset($val)?$val:'';
+                    break;
+                case 'integer':
+                    $newVal = isset($val)?$val:0;
+                    break;
+                case 'double':
+                    $newVal = isset($val)?$val:0.00;
+                    break;
+                default:
+                    $newVal = '';
+                    break;
+            }
+            $dataArr[$index] = $newVal;
+        }
+        return $dataArr;
+    }
+
     public static function parsingTokenParams($token, $key) {
         if(!$token) 
             return false;
@@ -596,6 +618,16 @@ class F {
     public static function assert($val, $msg) {
         if(!$val) 
             return F::buildJsonData(1, Consts::msgInfo($msg), $dataArr);
+    }
+
+    public static function userLevel($val) {
+        if($val <= 2000)
+            return '粉丝';
+        if($val > 2000 && $val <= 100000)
+            return '普通';
+        if($var > 100000)
+            return 'VIP';
+
     }
 
     
