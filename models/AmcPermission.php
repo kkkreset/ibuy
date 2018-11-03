@@ -27,7 +27,7 @@ class AmcPermission extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id','permissionname','type'], 'required'],
+            [['permissionname','type'], 'required'],
             [['id', 'type'], 'integer'],
             [['permissionname'], 'string', 'max' => 20],
             [['id'], 'unique'],
