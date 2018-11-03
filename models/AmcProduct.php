@@ -111,13 +111,12 @@ class AmcProduct extends \yii\db\ActiveRecord
         }
         $count = $query->count();
         $query->orderBy('id desc');
-        if($page <= 1) {
-            $limit = ' LIMIT 0,'.$pagesize;
-        }else{
-            $limit = ' LIMIT '.(($page - 1) * $pagesize).','.$pagesize;
+        $query->offset(0);
+        if($page > 1) {
+            $query->offset(($page - 1) * $pagesize);
         }
+        $query->limit($pagesize);
         $data = $query->all();
-        
         return compact('count', 'data');
     }
 
