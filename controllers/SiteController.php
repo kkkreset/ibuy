@@ -61,31 +61,31 @@ class SiteController extends Controller{
      *
      **/
     public function actionUpmoreimage() {
-        // $path = isset($_POST['path'])?$_POST['path']:'goods';
-        // $files =  isset($_FILES['files'])?$_FILES['files']:array();
-        // if(!$path && empty($files)) {
-        //     return F::buildJsonData(1, Consts::msgInfo(101));
-        // }
-        // $newImgArr = [];
-        // for($i=0; $i < count($files['name']); $i++) { 
-        //     $fileInfo = pathinfo($files['name'][$i]);
-        //     $bucketConfig = new Config(XY_UPYUN_SERVICE_NAME, XY_UPYUN_USERNAME, XY_UPYUN_PASSWORD);
-        //     $client = new Upyun($bucketConfig);
-        //     $pathBase = '/uploads/';
-        //     $res = $client->createDir($pathBase.$path);
-        //     // 读文件
-        //     $file = fopen($files['tmp_name'][$i], 'r');      
-        //     // 上传文件
-        //     $newImg = $path.'/'.date('Ymd').'/'.md5(time()).'.'.$fileInfo['extension'];
-        //     $res = $client->write($pathBase.$newImg, $file);
-        //     if($res['x-upyun-frames'] == 1) {
-        //         $newImgArr[] = $newImg;
-        //     }
-        //     sleep(2);
-        // }
-        // if($newImgArr) {
-        //     return F::buildJsonData(0, Consts::msgInfo(0),['images_url' => $newImgArr]);
-        // }
+        $path = isset($_POST['path'])?$_POST['path']:'goods';
+        $files =  isset($_FILES['files'])?$_FILES['files']:[];
+        if(!$path && empty($files)) {
+            return F::buildJsonData(1, Consts::msgInfo(101));
+        }
+        $newImgArr = [];
+        for($i=0; $i < count($files['name']); $i++) { 
+            $fileInfo = pathinfo($files['name'][$i]);
+            $bucketConfig = new Config(UPYUN_SERVICE_NAME, UPYUN_USERNAME, UPYUN_PASSWORD);
+            $client = new Upyun($bucketConfig);
+            $pathBase = '/uploads/';
+            $res = $client->createDir($pathBase.$path);
+            // 读文件
+            $file = fopen($files['tmp_name'][$i], 'r');      
+            // 上传文件
+            $newImg = $path.'/'.date('Ymd').'/'.md5(time()).'.'.$fileInfo['extension'];
+            $res = $client->write($pathBase.$newImg, $file);
+            if($res['x-upyun-frames'] == 1) {
+                $newImgArr[] = $newImg;
+            }
+            sleep(2);
+        }
+        if($newImgArr) {
+            return F::buildJsonData(0, Consts::msgInfo(0),['images_url' => $newImgArr]);
+        }
         return F::buildJsonData(1, Consts::msgInfo(3));   
         
     }
