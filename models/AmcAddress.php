@@ -35,7 +35,7 @@ class AmcAddress extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['address','phone','createtime','uid','zipcode','name','provinces','cities'], 'required'],
+            [['address','phone','uid','zipcode','name','provinces','cities'], 'required'],
             [['id', 'uid', 'isdefault', 'zipcode'], 'integer'],
             [['phone'], 'string', 'max' => 12],
             [['address'], 'string', 'max' => 200],

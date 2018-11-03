@@ -234,32 +234,17 @@ class UserController extends Controller{
             	return F::buildJsonData(0, Consts::msgInfo(),$addr);	
             }
     	}else if($type == 2){
-    		$addrs = AmcAddress::find()->where(['uid'=>$userObj->id])->all();
-    		if(!$addrs){
-    			return F::buildJsonData(0, Consts::msgInfo(),[]);
-    		}else{
-    			$addrs = ArrayHelper::toArray($addrs);
-    			$pid = array();
-    			$cid = array();
-    			$aid = array();
-    			foreach($addrs as $key => $val){
-    				$pid[] = $val['provinces'];
-    				$cid[] = $val['cities'];
-    				$aid[] = $val['areas'];
-    			}   			
-    			$pname = AmcProvinces::find()->where(['in','provinceid',$pid])->all();
-            	$cname = AmcCities::find()->where(['in','cityid',$cid])->all();
-            	$aname = AmcAreas::find()->where(['in','areaid',$aid])->all();
-            	$pname = ArrayHelper::toArray($pname);
-            	$cname = ArrayHelper::toArray($cname);
-            	$aname = ArrayHelper::toArray($aname);
-            	foreach($addrs as $key => $val){
-            		$addrs[$key]['pname'] = $pname[$key]['province'];
-            		$addrs[$key]['cname'] = $cname[$key]['city'];
-            		$addrs[$key]['aname'] = $aname[$key]['area'];
-            	}   			
-    			return F::buildJsonData(0, Consts::msgInfo(),$addrs);
-    		}
+    		$sql1 = "select b.province province from amc_address a LEFT JOIN  amc_provinces b on a.provinces = b.provinceid where uid = {$userObj->id} order by a.id desc";
+    		$sql2 = "select b.city city from amc_address a LEFT JOIN  amc_cities b on a.cities = b.cityid where uid = {$userObj->id} order by a.id desc";
+    		$sql3 = "select a.id id,a.address address,a.phone phone,a.uid uid,a.isdefault isdefault,a.zipcode zipcode,a.provinces provinces,a.cities cities,a.areas areas,a.name name,b.area aname from amc_address a LEFT JOIN  amc_areas b on a.areas = b.areaid where uid = {$userObj->id} order by a.id desc";
+			$pname = Yii::$app->db->createCommand($sql1)->queryAll();
+			$cname = Yii::$app->db->createCommand($sql2)->queryAll();
+			$aname = Yii::$app->db->createCommand($sql3)->queryAll();
+			foreach($aname as $key => $val){
+				$aname[$key]['pname'] = $pname[$key]['province'];
+				$aname[$key]['cname'] = $cname[$key]['city'];
+			}    		   			
+    		return F::buildJsonData(0, Consts::msgInfo(),$aname);
     	}else if($type == 3){
     		$addr = AmcAddress::find()->where(['isdefault'=>2,'uid'=>$userObj->id])->one();
     		if(!$addr){
