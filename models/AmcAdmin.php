@@ -32,7 +32,7 @@ class AmcAdmin extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id','username','password','createtime'], 'required'],
+            [['username','password','createtime'], 'required'],
             [['id', 'status'], 'integer'],
             [['username', 'password', 'name'], 'string', 'max' => 20],
             [['createtime'], 'string', 'max' => 12],

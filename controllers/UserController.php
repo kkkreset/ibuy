@@ -4,12 +4,16 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
 use app\commands\F;
 use app\commands\Consts;
 use app\models\AmcUser;
 use app\models\AmcAddress;
+use app\models\AmcProvinces;
+use app\models\AmcCities;
+use app\models\AmcAreas;
 
 class UserController extends Controller{
 
@@ -47,7 +51,17 @@ class UserController extends Controller{
     	$json = json_decode($postData);
     	$return = self::baseValidate($json);
     	if($return['code'] == 0){
-    		return F::buildJsonData(0, Consts::msgInfo(),$return['msg']->toArray());
+			$levelunm = Consts::$levelNum;
+    		$userinfo = $return['msg'];
+    		$userinfoArr = $userinfo->toArray();
+    		if($userinfoArr['hdlock']<$levelunm[0]){
+    			$userinfoArr['userlv'] = Consts::$userLevel[0];
+    		}else if($userinfoArr['hdlock']<$levelunm[1]){
+    			$userinfoArr['userlv'] = Consts::$userLevel[1];
+    		}else{
+    			$userinfoArr['userlv'] = Consts::$userLevel[2];
+    		}
+    		return F::buildJsonData(0, Consts::msgInfo(),$userinfoArr);
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
@@ -122,14 +136,22 @@ class UserController extends Controller{
     	}
         $phone = isset($json->data->phone)?$json->data->phone:'';
         $address = isset($json->data->address)?$json->data->address:'';
-        $zipcode = isset($json->data->zipcode)?$json->data->zipcode:'';
-		if(!$phone || !$address || !$zipcode)
+        $zipcode = isset($json->data->zipcode)?$json->data->zipcode:'000000';
+        $name = isset($json->data->name)?$json->data->name:'';
+        $provinces = isset($json->data->provinces)?$json->data->provinces:'';
+        $cities = isset($json->data->cities)?$json->data->cities:'';
+        $areas = isset($json->data->areas)?$json->data->areas:'';
+		if(!$phone || !$address || !$name || !$provinces || !$cities)
             return F::buildJsonData(1, Consts::msgInfo(10011));
         $addr = new AmcAddress();
         $addr->phone = $phone;
         $addr->address = $address;
         $addr->zipcode = $zipcode;
-        $addr->createtime = time();
+        $addr->name = $name;
+        $addr->provinces = $provinces;
+        $addr->cities = $cities;
+        $addr->areas = $areas;
+//      $addr->createtime = (string)time();
         $addr->uid = $userObj->id;
         if($addr->validate()){
             if($addr->errors) {
@@ -172,13 +194,14 @@ class UserController extends Controller{
                 return F::buildJsonData(1,$newDefault->errors);
             }
             $newDefault->save();
-        }
+    }   	
 		return F::buildJsonData(0, Consts::msgInfo());    	
     }
     
     /*
      * 获取收货信息
-     * type 1 单个  2 所有
+     * type 1 单个  2 所有 3默认
+     * 
      */
     public function actionGetaddr(){
     	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
@@ -193,14 +216,54 @@ class UserController extends Controller{
     	if($type == 1){
     		$id = isset($json->data->id)?$json->data->id:'';
     		if(!$id)
-            	return F::buildJsonData(1, Consts::msgInfo(10011));
-           	$addr = AmcAddress::find()->where(['id'=>$id])->one();
-           	F::buildJsonData(0, Consts::msgInfo(),$addr);
+            	return F::buildJsonData(1, Consts::msgInfo(10011));           
+            $addr = AmcAddress::find()->where(['id'=>$id])->one();
+            if(!$addr){
+            	return F::buildJsonData(0, Consts::msgInfo(),[]);	
+            }else{ 
+            	$pname = AmcProvinces::find()->where(['provinceid'=>$addr->provinces])->one();
+            	$cname = AmcCities::find()->where(['cityid'=>$addr->cities])->one();
+            	$aname = AmcAreas::find()->where(['areaid'=>$addr->areas])->one();
+            	$addr = $addr->toArray();
+            	$pname = $pname->toArray(); 
+            	$cname = $cname->toArray();
+            	$aname = $aname->toArray();
+            	$addr['pname'] = $pname['province'];
+            	$addr['cname'] = $cname['city'];
+            	$addr['aname'] = $aname['area'];            	
+            	return F::buildJsonData(0, Consts::msgInfo(),$addr);	
+            }
     	}else if($type == 2){
-    		$addrs = AmcAddress::find()->where(['uid'=>$userObj->id])->all();
-    		F::buildJsonData(0, Consts::msgInfo(),$addrs);
+    		$sql1 = "select b.province province from amc_address a LEFT JOIN  amc_provinces b on a.provinces = b.provinceid where uid = {$userObj->id} order by a.id desc";
+    		$sql2 = "select b.city city from amc_address a LEFT JOIN  amc_cities b on a.cities = b.cityid where uid = {$userObj->id} order by a.id desc";
+    		$sql3 = "select a.id id,a.address address,a.phone phone,a.uid uid,a.isdefault isdefault,a.zipcode zipcode,a.provinces provinces,a.cities cities,a.areas areas,a.name name,b.area aname from amc_address a LEFT JOIN  amc_areas b on a.areas = b.areaid where uid = {$userObj->id} order by a.id desc";
+			$pname = Yii::$app->db->createCommand($sql1)->queryAll();
+			$cname = Yii::$app->db->createCommand($sql2)->queryAll();
+			$aname = Yii::$app->db->createCommand($sql3)->queryAll();
+			foreach($aname as $key => $val){
+				$aname[$key]['pname'] = $pname[$key]['province'];
+				$aname[$key]['cname'] = $cname[$key]['city'];
+			}    		   			
+    		return F::buildJsonData(0, Consts::msgInfo(),$aname);
+    	}else if($type == 3){
+    		$addr = AmcAddress::find()->where(['isdefault'=>2,'uid'=>$userObj->id])->one();
+    		if(!$addr){
+    			return F::buildJsonData(0, Consts::msgInfo(),[]);
+    		}else{
+    			$pname = AmcProvinces::find()->where(['provinceid'=>$addr->provinces])->one();
+            	$cname = AmcCities::find()->where(['cityid'=>$addr->cities])->one();
+            	$aname = AmcAreas::find()->where(['areaid'=>$addr->areas])->one();
+            	$addr = $addr->toArray();
+            	$pname = $pname->toArray(); 
+            	$cname = $cname->toArray();
+            	$aname = $aname->toArray();
+            	$addr['pname'] = $pname['province'];
+            	$addr['cname'] = $cname['city'];
+            	$addr['aname'] = $aname['area'];     
+    			return F::buildJsonData(0, Consts::msgInfo(),$addr);
+    		}
     	}else{
-    		F::buildJsonData(1, Consts::msgInfo(10010));
+    		return F::buildJsonData(1, Consts::msgInfo(10010));
     	}
     }
     
@@ -211,22 +274,30 @@ class UserController extends Controller{
     public function actionReviseaddr(){
     	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
     	$json = json_decode($postData);
-    	$return = self::baseValidate($json);
-    	if($return['code'] == 0){
-    		$userObj = $return['msg'];
-    	}else{
-    		return F::buildJsonData(1, Consts::msgInfo($return['code']));
-    	}
+//  	$return = self::baseValidate($json);
+//  	if($return['code'] == 0){
+//  		$userObj = $return['msg'];
+//  	}else{
+//  		return F::buildJsonData(1, Consts::msgInfo($return['code']));
+//  	}
     	$id = isset($json->data->id)?$json->data->id:'';
     	$phone = isset($json->data->phone)?$json->data->phone:'';
     	$address = isset($json->data->address)?$json->data->address:'';
-    	$zipcode = isset($json->data->zipcode)?$json->data->zipcode:'';
-    	if(!$id || !$phone || !$address || !$zipcode )
+    	$zipcode = isset($json->data->zipcode)?$json->data->zipcode:'000000';
+    	$name = isset($json->data->name)?$json->data->name:'';
+        $provinces = isset($json->data->provinces)?$json->data->provinces:'';
+        $cities = isset($json->data->cities)?$json->data->cities:'';
+        $areas = isset($json->data->areas)?$json->data->areas:'';
+    	if(!$id || !$phone || !$address || !$name || !$provinces || !$cities)
             return F::buildJsonData(1, Consts::msgInfo(10011));            
-        $addr = AmcAddress::find()->where(['id'=>$id])->one();        
-		$addr->$phone = $phone;
-		$addr->$address = $address;
-		$addr->$zipcode = $zipcode;
+        $addr = AmcAddress::find()->where(['id'=>$id])->one();      
+		$addr->phone = $phone;
+		$addr->address = $address;
+		$addr->zipcode = $zipcode;
+		$addr->name = $name;
+        $addr->provinces = $provinces;
+        $addr->cities = $cities;
+        $addr->areas = $areas;
 		if($addr->validate()){
             if($addr->errors) {
                 return F::buildJsonData(1,$addr->errors);
@@ -234,6 +305,56 @@ class UserController extends Controller{
             $addr->save();
         }
 		return F::buildJsonData(0, Consts::msgInfo()); 
+    }
+    
+    /*
+     * 删除收货地址
+     */
+    public function actionDeladdr(){
+    	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
+    	$json = json_decode($postData);
+    	$return = self::baseValidate($json);
+    	if($return['code'] == 0){
+    		$userObj = $return['msg'];
+    	}else{
+    		return F::buildJsonData(1, Consts::msgInfo($return['code']));
+    	}
+    	$id = isset($json->data->id)?$json->data->id:'';
+    	if(!$id)
+            return F::buildJsonData(1, Consts::msgInfo(10011)); 
+        $addr = AmcAddress::find()->where(['id'=>$id,'uid'=>$userObj->id])->one();
+        if(!$addr)
+        	return F::buildJsonData(1, Consts::msgInfo(10024)); 
+        AmcAddress::find()->where(['id'=>$id,'uid'=>$userObj->id])->one()->delete();
+		return F::buildJsonData(0, Consts::msgInfo());         
+    }
+    
+    /*
+     * 获取省市区
+     * type 1 省  2 市 3 区
+     */
+    public function actionGetarea(){
+    	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
+    	$json = json_decode($postData);
+    	$type = isset($json->data->type)?$json->data->type:'';
+    	if(!$type)
+    		return F::buildJsonData(1, Consts::msgInfo(10011)); 
+    	if($type == 1){
+    		$provinces = AmcProvinces::find()->all();
+    		return F::buildJsonData(0, Consts::msgInfo(),ArrayHelper::toArray($provinces));
+    	}else{
+    		$id = isset($json->data->id)?$json->data->id:'';
+    		if(!$id)
+    			return F::buildJsonData(1, Consts::msgInfo(10011)); 
+    		if($type == 2){
+    			$cities = AmcCities::find()->where(['provinceid'=>$id])->all();
+    			return F::buildJsonData(0, Consts::msgInfo(),ArrayHelper::toArray($cities));
+    		}else if($type == 3){
+    			$areas = AmcAreas::find()->where(['cityid'=>$id])->all();
+    			return F::buildJsonData(0, Consts::msgInfo(),ArrayHelper::toArray($areas));
+    		}
+    	}
+    	
     }
 
 }

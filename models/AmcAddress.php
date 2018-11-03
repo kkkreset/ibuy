@@ -14,6 +14,10 @@ use Yii;
  * @property int 	$isdefault 默认地址 1不是 2是
  * @property string $createtime 注册时间
  * @property int 	$zipcode 邮编
+ * @property int 	$name 收货人
+ * @property int 	$provinces 省
+ * @property int 	$cities 市
+ * @property int 	$areas 区
  */
 class AmcAddress extends \yii\db\ActiveRecord
 {
@@ -31,9 +35,9 @@ class AmcAddress extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id','address','phone','createtime','uid','zipcode'], 'required'],
+            [['address','phone','uid','zipcode','name','provinces','cities'], 'required'],
             [['id', 'uid', 'isdefault', 'zipcode'], 'integer'],
-            [['phone', 'createtime'], 'string', 'max' => 12],
+            [['phone'], 'string', 'max' => 12],
             [['address'], 'string', 'max' => 200],
             [['id'], 'unique'],
         ];
@@ -51,7 +55,11 @@ class AmcAddress extends \yii\db\ActiveRecord
             'uid' => 'Uid',
             'isdefault' => 'Isdefault',
             'createtime' => 'Createtime',
-            'zipcode' => 'Zipcode',          
+            'zipcode' => 'Zipcode',  
+            'name'=>'Name',
+            'provinces'=>'Provinces',
+            'cities'=>'Cities',
+            'areas'=>'Areas',        
         ];
     }
 }
