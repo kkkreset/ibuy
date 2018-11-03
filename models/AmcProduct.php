@@ -99,6 +99,9 @@ class AmcProduct extends \yii\db\ActiveRecord
                     case 'title':
                         $query->andWhere(['like','title',$v]);
                         break;
+                    case 'level':
+                        $query->andWhere('level = '.$v);
+                        break;
                     default:
                         $query->andWhere(['like','title',$v]);
                         break;
@@ -113,6 +116,7 @@ class AmcProduct extends \yii\db\ActiveRecord
             $limit = ' LIMIT '.(($page - 1) * $pagesize).','.$pagesize;
         }
         $data = $query->all();
+        
         return compact('count', 'data');
     }
 

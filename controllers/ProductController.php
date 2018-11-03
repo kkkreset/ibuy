@@ -17,7 +17,7 @@ class ProductController extends Controller{
 	**/ 
 	public function actionList() {
 		$json = F::parsingPost();
-		$dataObj = isset($json->jData)?$json->jData:'';
+		$dataObj = isset($json->data)?$json->data:'';
 		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
 		$page = isset($dataObj->page)?$dataObj->page: 1;
 		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
@@ -32,7 +32,7 @@ class ProductController extends Controller{
 
 	public function actionInfo() {
 		$json = F::parsingPost();
-		$dataObj = isset($json->jData)?$json->jData:'';
+		$dataObj = isset($json->data)?$json->data:'';
 		$id = isset($dataObj->id)?$dataObj->id:0;
 		$sku = isset($dataObj->sku)?$dataObj->sku:'';
 

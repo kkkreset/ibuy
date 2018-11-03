@@ -66,7 +66,7 @@ class OrderController extends BaseController{
 		}
 		$orderObj = new AmcOrder();
 		$orderObj->ocode = 'HD'.$userObj->id.date('YmdHis'); //订单号
-		$orderObj->status = 10;// 会员租聘，成功后直接发货
+		$orderObj->status = 10;// 待付款
 		//商品ID
 		$orderObj->pid = $pid;
 		//用户ID
