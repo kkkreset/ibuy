@@ -151,7 +151,7 @@ class UserController extends Controller{
         $addr->provinces = $provinces;
         $addr->cities = $cities;
         $addr->areas = $areas;
-        $addr->createtime = (string)time();
+//      $addr->createtime = (string)time();
         $addr->uid = $userObj->id;
         if($addr->validate()){
             if($addr->errors) {
@@ -194,7 +194,7 @@ class UserController extends Controller{
                 return F::buildJsonData(1,$newDefault->errors);
             }
             $newDefault->save();
-        }
+    }   	
 		return F::buildJsonData(0, Consts::msgInfo());    	
     }
     
