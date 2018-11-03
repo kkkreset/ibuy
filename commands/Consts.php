@@ -52,4 +52,14 @@ class Consts {
 		12=>'待签收',
 	];
 
+    /**
+     * 商城分类
+     * @var array
+     */
+	public static $mallLeaveTitle = [
+	    1=>'应用商城',
+        2=>'消费商城',
+        3=>'共享商城',
+    ];
+
 }

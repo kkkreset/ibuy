@@ -5,6 +5,7 @@
  */
 namespace app\commands;
 
+use app\models\AmcUser;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -17,7 +18,7 @@ class BaseController extends Controller {
 
     public  $json;
     public  $jData;
-    private $access_token;
+    protected $access_token;
     public  $token;
     
     /**
@@ -44,6 +45,15 @@ class BaseController extends Controller {
             }
         }
         return true;
+    }
+
+    /**
+     * @param $accessToken
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    protected function getUserInfo($accessToken)
+    {
+        return AmcUser::find()->where(['token'=>$accessToken])->one();
     }
 
 }

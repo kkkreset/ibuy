@@ -55,7 +55,7 @@ class AmcProduct extends \yii\db\ActiveRecord
             [['addtime'], 'safe'],
             [['title', 'title_c', 'img'], 'string', 'max' => 100],
             [['level_title'], 'string', 'max' => 50],
-            [['is_view', 'is_del', 'is_hot'], 'string', 'max' => 1],
+            //[['is_view', 'is_del', 'is_hot'], 'string', 'max' => 1],
         ];
     }
 
