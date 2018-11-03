@@ -37,7 +37,7 @@ class ProductController extends Controller{
 		$sku = isset($dataObj->sku)?$dataObj->sku:'';
 
 		if(!$id && !$sku) 
-			return F::buildJsonData(1, Consts::msgInfo(4));
+			return F::buildJsonData(4, Consts::msgInfo(4));
 
 		$product = AmcProduct::findByProduct($id, $sku);
 		if($product->attributes) {
