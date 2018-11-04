@@ -50,8 +50,8 @@ class BaseController extends Controller {
                 return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
             }
             $this->user = AmcUser::findByPhone($phone);
-//            if(!$userObj)
-//                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
+            if(!$userObj)
+                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
         }
         return true;
     }
