@@ -7,6 +7,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
+use app\commands\BaseController;
 use app\commands\F;
 use app\commands\Consts;
 use app\models\AmcUser;
@@ -17,7 +18,7 @@ use app\models\AmcAreas;
 use app\models\AmcRecharge;
 use app\models\AmcHdTransfer;
 
-class UserController extends Controller{
+class UserController extends BaseController{
 	public function init(){
 		date_default_timezone_set("PRC");
 	}
@@ -36,7 +37,7 @@ class UserController extends Controller{
      * 验证
      */
     public function baseValidate($json){
-    	$token = isset($json->data->access_token)?$json->data->access_token:'';
+    	$token = isset($json->access_token)?$json->access_token:'';
     	if(!$token){
     		return ['code' => 41001, 'msg' =>''];
     	}
@@ -90,9 +91,9 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$userObj->name = isset($json->data->name)?$json->data->name:'';
-    	$userObj->cardnum = isset($json->data->cardnum)?$json->data->cardnum:'';
-    	$userObj->avatar = isset($json->data->avatar)?$json->data->avatar:'';
+    	$userObj->name = isset($json->name)?$json->name:'';
+    	$userObj->cardnum = isset($json->cardnum)?$json->cardnum:'';
+    	$userObj->avatar = isset($json->avatar)?$json->avatar:'';
     	if($userObj->validate()){
             if($userObj->errors) {
                 return F::buildJsonData(1,$userObj->errors);
@@ -114,12 +115,12 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$newpsw = $json->data->password;
+    	$newpsw = $json->password;
     	if(!$newpsw){
     		return F::buildJsonData(1, Consts::msgInfo(10011));
     	}
     	$oldpsw1 = $userObj->password;
-    	$oldpsw2 = $json->data->oldpsw;
+    	$oldpsw2 = $json->oldpsw;
     	if($oldpsw1 != md5(md5($oldpsw2))){
     		return F::buildJsonData(1, Consts::msgInfo(10023));
     	}
@@ -151,9 +152,9 @@ class UserController extends Controller{
     		$userObj->register = time();
     		$userObj->hdlock = $userObj->hdlock + 0.5;
     		$userObj->save();
-    		//TODO 插入交易记录表
+
     		$hdcharge = new AmcHdTransfer();
-    		$hdcharge->code = F::randStr(20, 'NUMBER');
+    		$hdcharge->code =  date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 12);
     		$hdcharge->receiverid = $userObj->id;
     		$hdcharge->receivertel = $userObj->phone;
     		$hdcharge->premoney = 0.5;
@@ -179,10 +180,10 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$name = isset($json->data->name)?$json->data->name:'';
-    	$money = isset($json->data->money)?$json->data->money:'';
-    	$remark = isset($json->data->remark)?$json->data->remark:'';
-    	$image = isset($json->data->image)?$json->data->image:'';
+    	$name = isset($json->name)?$json->name:'';
+    	$money = isset($json->money)?$json->money:'';
+    	$remark = isset($json->remark)?$json->remark:'';
+    	$image = isset($json->image)?$json->image:'';
     	if(!$name || !$money || !$remark || !$image){
     		return F::buildJsonData(1, Consts::msgInfo(10011));
     	}
@@ -197,7 +198,7 @@ class UserController extends Controller{
     	$recharge->rpremoney = $money;
     	$recharge->rbankname = $name;
     	$recharge->raddtime = date("Y-m-d H:i:s");
-    	$recharge->rechcode = F::randStr(20, 'NUMBER');
+    	$recharge->rechcode = date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 12);
     	$recharge->save();
         return F::buildJsonData(0, Consts::msgInfo());
     }
@@ -231,13 +232,13 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-        $phone = isset($json->data->phone)?$json->data->phone:'';
-        $address = isset($json->data->address)?$json->data->address:'';
-        $zipcode = isset($json->data->zipcode)?$json->data->zipcode:'000000';
-        $name = isset($json->data->name)?$json->data->name:'';
-        $provinces = isset($json->data->provinces)?$json->data->provinces:'';
-        $cities = isset($json->data->cities)?$json->data->cities:'';
-        $areas = isset($json->data->areas)?$json->data->areas:'';
+        $phone = isset($json->phone)?$json->phone:'';
+        $address = isset($json->address)?$json->address:'';
+        $zipcode = isset($json->zipcode)?$json->zipcode:'000000';
+        $name = isset($json->name)?$json->name:'';
+        $provinces = isset($json->provinces)?$json->provinces:'';
+        $cities = isset($json->cities)?$json->cities:'';
+        $areas = isset($json->areas)?$json->areas:'';
 		if(!$phone || !$address || !$name || !$provinces || !$cities)
             return F::buildJsonData(1, Consts::msgInfo(10011));
         $addr = new AmcAddress();
@@ -271,7 +272,7 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$id = isset($json->data->id)?$json->data->id:'';
+    	$id = isset($json->id)?$json->id:'';
     	if(!$id)
             return F::buildJsonData(1, Consts::msgInfo(10011));
         $oldDefault = AmcAddress::find()->where(['isdefault'=>2,'uid'=>$userObj->id])->one();
@@ -309,9 +310,9 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$type = isset($json->data->type)?$json->data->type:'1';
+    	$type = isset($json->type)?$json->type:'1';
     	if($type == 1){
-    		$id = isset($json->data->id)?$json->data->id:'';
+    		$id = isset($json->id)?$json->id:'';
     		if(!$id)
             	return F::buildJsonData(1, Consts::msgInfo(10011));           
             $addr = AmcAddress::find()->where(['id'=>$id])->one();
@@ -377,14 +378,14 @@ class UserController extends Controller{
 //  	}else{
 //  		return F::buildJsonData(1, Consts::msgInfo($return['code']));
 //  	}
-    	$id = isset($json->data->id)?$json->data->id:'';
-    	$phone = isset($json->data->phone)?$json->data->phone:'';
-    	$address = isset($json->data->address)?$json->data->address:'';
-    	$zipcode = isset($json->data->zipcode)?$json->data->zipcode:'000000';
-    	$name = isset($json->data->name)?$json->data->name:'';
-        $provinces = isset($json->data->provinces)?$json->data->provinces:'';
-        $cities = isset($json->data->cities)?$json->data->cities:'';
-        $areas = isset($json->data->areas)?$json->data->areas:'';
+    	$id = isset($json->id)?$json->id:'';
+    	$phone = isset($json->phone)?$json->phone:'';
+    	$address = isset($json->address)?$json->address:'';
+    	$zipcode = isset($json->zipcode)?$json->zipcode:'000000';
+    	$name = isset($json->name)?$json->name:'';
+        $provinces = isset($json->provinces)?$json->provinces:'';
+        $cities = isset($json->cities)?$json->cities:'';
+        $areas = isset($json->areas)?$json->areas:'';
     	if(!$id || !$phone || !$address || !$name || !$provinces || !$cities)
             return F::buildJsonData(1, Consts::msgInfo(10011));            
         $addr = AmcAddress::find()->where(['id'=>$id])->one();      
@@ -416,7 +417,7 @@ class UserController extends Controller{
     	}else{
     		return F::buildJsonData(1, Consts::msgInfo($return['code']));
     	}
-    	$id = isset($json->data->id)?$json->data->id:'';
+    	$id = isset($json->id)?$json->id:'';
     	if(!$id)
             return F::buildJsonData(1, Consts::msgInfo(10011)); 
         $addr = AmcAddress::find()->where(['id'=>$id,'uid'=>$userObj->id])->one();
@@ -433,14 +434,14 @@ class UserController extends Controller{
     public function actionGetarea(){
     	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
     	$json = json_decode($postData);
-    	$type = isset($json->data->type)?$json->data->type:'';
+    	$type = isset($json->type)?$json->type:'';
     	if(!$type)
     		return F::buildJsonData(1, Consts::msgInfo(10011)); 
     	if($type == 1){
     		$provinces = AmcProvinces::find()->all();
     		return F::buildJsonData(0, Consts::msgInfo(),ArrayHelper::toArray($provinces));
     	}else{
-    		$id = isset($json->data->id)?$json->data->id:'';
+    		$id = isset($json->id)?$json->id:'';
     		if(!$id)
     			return F::buildJsonData(1, Consts::msgInfo(10011)); 
     		if($type == 2){
