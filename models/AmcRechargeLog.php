@@ -37,7 +37,7 @@ class AmcRechargeLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
+//            [['id'], 'required'],
             [['id', 'treceiverid', 'tpayerid', 'taccounttype', 'ttype', 'tstate'], 'integer'],
             [['tpremoney', 'tmoney'], 'number'],
             [['tpayertel', 'treceivertel'], 'string', 'max' => 11],
