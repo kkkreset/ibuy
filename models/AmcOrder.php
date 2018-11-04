@@ -117,6 +117,7 @@ class AmcOrder extends \yii\db\ActiveRecord
         }
         $query->limit($pagesize);
         $data = $query->all();
+        // echo $query->createCommand()->sql;
         return compact('count', 'data');
     }
 

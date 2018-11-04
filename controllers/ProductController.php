@@ -8,6 +8,7 @@ use app\commands\Consts;
 use app\models\AmcProduct;
 use app\models\AmcProductImgs;
 use app\models\AmcProductCategory;
+use app\models\AmcProductShop;
 
 
 class ProductController extends Controller{
@@ -41,6 +42,9 @@ class ProductController extends Controller{
 			return F::buildJsonData(4, Consts::msgInfo(4));
 
 		$product = AmcProduct::findByProduct($id, $sku);
+		if(!$product) {
+			return F::buildJsonData(21001, Consts::msgInfo(21001));
+		}
 		if($product->attributes) {
 			$imgsObjArr = AmcProductImgs::findAllByPid($product->id);
 			$imgs = [];
@@ -70,6 +74,6 @@ class ProductController extends Controller{
 		$dataArr['totalPages'] = $list['count'];
 
 		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
-		return F::buildJsonData(0, Consts::msgInfo(), $product->attributes);
 	}
+
 }

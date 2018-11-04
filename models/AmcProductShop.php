@@ -54,4 +54,32 @@ class AmcProductShop extends \yii\db\ActiveRecord
             'ctime' => 'Ctime',
         ];
     }
+
+    public static function findByAll($condition=[], $page=1, $pagesize=10) {
+        $query = AmcProductShop::find();
+        $query->from('amc_product_shop t');
+        $query->select('t.*');
+        foreach ($condition as $k => $v) {
+            if($v) {
+                switch ($k) {
+                    case 'uid':
+                        $query->andWhere('t.uid = '.$v);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        $count = $query->count();
+        $query->orderBy('t.id desc');
+        $query->offset(0);
+        if($page > 1) {
+            $query->offset(($page - 1) * $pagesize);
+        }
+        $query->limit($pagesize);
+        $data = $query->all();
+        return compact('count', 'data');
+    }
+
+    }
 }
