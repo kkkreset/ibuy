@@ -99,9 +99,16 @@ class AmcProduct extends \yii\db\ActiveRecord
                 switch ($k) {
                     case 'title':
                         $query->andWhere(['like','title',$v]);
+                        $query->orWhere(['like','title_c',$v]);
                         break;
                     case 'level':
                         $query->andWhere('level = '.$v);
+                        break;
+                    case 'category_id':
+                        $query->andWhere('category_id = '.$v);
+                        break;
+                    case 'is_hot':
+                        $query->andWhere('is_hot = '.$v);
                         break;
                     default:
                         $query->andWhere(['like','title',$v]);

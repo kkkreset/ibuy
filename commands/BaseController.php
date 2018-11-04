@@ -20,8 +20,8 @@ class BaseController extends Controller {
     public  $jData;
     private $access_token;
     public  $token;
-    public $user;
-    public $layout = false;
+    public  $user;
+    public  $layout = false;
 
     /**
      * @var array the breadcrumbs of the current page. The value of this property will
@@ -50,8 +50,9 @@ class BaseController extends Controller {
                 return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
             }
             $this->user = AmcUser::findByPhone($phone);
-//            if(!$userObj)
-//                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
+            if(!$this->user) {
+                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
+            }
         }
         return true;
     }
