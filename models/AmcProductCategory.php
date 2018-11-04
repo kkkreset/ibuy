@@ -47,4 +47,22 @@ class AmcProductCategory extends \yii\db\ActiveRecord
             'is_del' => 'Is Del',
         ];
     }
+
+    public function findByAll($condition=[],$page=1,$pagesize=10) {
+        $query = AmcProductCategory::find();
+        $query->from('amc_product_category t');
+        if($condition->type != 'all') {
+            $query->where('t.r_id = '.$condition->type);
+        }
+    
+        $count = $query->count();
+        $query->orderBy('t.id desc');
+        $query->offset(0);
+        if($page > 1) {
+            $query->offset(($page - 1) * $pagesize);
+        }
+        $query->limit($pagesize);
+        $data = $query->all();
+        return compact('count', 'data');
+    }
 }

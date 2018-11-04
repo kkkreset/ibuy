@@ -7,6 +7,7 @@ use app\commands\F;
 use app\commands\Consts;
 use app\models\AmcProduct;
 use app\models\AmcProductImgs;
+use app\models\AmcProductCategory;
 
 
 class ProductController extends Controller{
@@ -49,6 +50,26 @@ class ProductController extends Controller{
 			$imgArr['imgs'] = $imgs;
 			return F::buildJsonData(0, Consts::msgInfo(), array_merge($product->attributes, $imgArr));
 		}
+		return F::buildJsonData(0, Consts::msgInfo(), $product->attributes);
+	}
+
+	public function actionCategory() {
+		$json = F::parsingPost();
+		$dataObj = isset($json->data)?$json->data:'';
+		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
+		$page = isset($dataObj->page)?$dataObj->page: 1;
+		$pagesize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
+
+		if(empty($condition) ) {
+			return F::buildJsonData(4, Consts::msgInfo(4));
+		}
+		$list = AmcProductCategory::findByAll($condition, $page, $pagesize);
+		$dataArr = F::newModelToArr($list['data']);
+
+		$dataArr['nextPageNo'] = F::pages($list['count'], $page, $pagesize);
+		$dataArr['totalPages'] = $list['count'];
+
+		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
 		return F::buildJsonData(0, Consts::msgInfo(), $product->attributes);
 	}
 }
