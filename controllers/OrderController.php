@@ -15,6 +15,9 @@ class OrderController extends BaseController{
 
 	public function actionList() {
 		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
 		$page = isset($dataObj->page)?$dataObj->page: 1;
 		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
 		$condition = empty($dataObj->condition)?[]:$dataObj->condition;
@@ -30,6 +33,9 @@ class OrderController extends BaseController{
 
 	public function actionInfo() {
 		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
 		$id = isset($dataObj->id)?$dataObj->id:0;
 		$ocode = isset($dataObj->ocode)?$dataObj->ocode:'';
 		
@@ -46,6 +52,9 @@ class OrderController extends BaseController{
 
 	public function actionNew() {
 		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
 		$pid = isset($dataObj->pid)?$dataObj->pid:0;
 		$addres_id = isset($dataObj->address_id)?$dataObj->address_id:0;
 		$payWay = isset($dataObj->pay_way)?$dataObj->pay_way:0;
