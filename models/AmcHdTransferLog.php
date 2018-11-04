@@ -36,7 +36,7 @@ class AmcHdTransferLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'rtype'], 'required'],
+            [['rtype'], 'required'],
             [['id', 'rechcode', 'rtype', 'userid', 'rstate'], 'integer'],
             [['rmoney', 'rpremoney'], 'number'],
             [['rpasstime', 'raddtime'], 'safe'],

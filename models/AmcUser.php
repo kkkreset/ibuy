@@ -96,4 +96,9 @@ class AmcUser extends \yii\db\ActiveRecord
     public static function findByPhone($phone){
         return AmcUser::find()->where(['phone'=>$phone, 'status'=>1])->one();
     }
+
+
+    public static function findById($id){
+        return AmcUser::find()->where(['id'=>$id])->one();
+    }
 }

@@ -14,11 +14,16 @@ use app\models\AmcAddress;
 use app\models\AmcProvinces;
 use app\models\AmcCities;
 use app\models\AmcAreas;
+use app\models\AmcRecharge;
+use app\models\AmcHdTransfer;
 
 class UserController extends Controller{
+	public function init(){
+		date_default_timezone_set("PRC");
+	}
 
     public $layout = false;
-
+	
     public function actionError() {
         return $this->render('error');
     }
@@ -60,6 +65,12 @@ class UserController extends Controller{
     			$userinfoArr['userlv'] = Consts::$userLevel[1];
     		}else{
     			$userinfoArr['userlv'] = Consts::$userLevel[2];
+    		}
+    		if($userinfoArr['register'] && $userinfoArr['register'] >= strtotime(date("Y-m-d 00:00:00"))){
+    			//已签到
+    			$userinfoArr['registertype'] = 2;
+    		}else{
+    			$userinfoArr['registertype'] = 1;
     		}
     		return F::buildJsonData(0, Consts::msgInfo(),$userinfoArr);
     	}else{
@@ -119,6 +130,92 @@ class UserController extends Controller{
             }
             $userObj->save();
         }
+    	return F::buildJsonData(0, Consts::msgInfo());
+    }
+    
+    /*
+     * 签到
+     */
+    public function actionRegister(){
+    	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
+    	$json = json_decode($postData);
+    	$return = self::baseValidate($json);
+    	if($return['code'] == 0){
+    		$userObj = $return['msg'];
+    	}else{
+    		return F::buildJsonData(1, Consts::msgInfo($return['code']));
+    	}
+    	if($userObj->register && $userObj->register >= strtotime(date("Y-m-d 00:00:00"))){
+    		return F::buildJsonData(1, Consts::msgInfo(10025));
+    	}else{
+    		$userObj->register = time();
+    		$userObj->hdlock = $userObj->hdlock + 0.5;
+    		$userObj->save();
+    		//TODO 插入交易记录表
+    		$hdcharge = new AmcHdTransfer();
+    		$hdcharge->code = F::randStr(20, 'NUMBER');
+    		$hdcharge->receiverid = $userObj->id;
+    		$hdcharge->receivertel = $userObj->phone;
+    		$hdcharge->premoney = 0.5;
+    		$hdcharge->money = 0.5;
+    		$hdcharge->state = 1;
+    		$hdcharge->title = "签到";
+    		$hdcharge->accounttype = 6;
+    		$hdcharge->addtime = date("Y-m-d H:i:s");
+    		$hdcharge->save();
+    		return F::buildJsonData(0, Consts::msgInfo());
+    	}
+    }
+    
+    /*
+     * 充值凭证上传
+     */
+    public function actionRecharge(){
+    	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
+    	$json = json_decode($postData);
+    	$return = self::baseValidate($json);
+    	if($return['code'] == 0){
+    		$userObj = $return['msg'];
+    	}else{
+    		return F::buildJsonData(1, Consts::msgInfo($return['code']));
+    	}
+    	$name = isset($json->data->name)?$json->data->name:'';
+    	$money = isset($json->data->money)?$json->data->money:'';
+    	$remark = isset($json->data->remark)?$json->data->remark:'';
+    	$image = isset($json->data->image)?$json->data->image:'';
+    	if(!$name || !$money || !$remark || !$image){
+    		return F::buildJsonData(1, Consts::msgInfo(10011));
+    	}
+    	$recharge = new AmcRecharge();
+    	$recharge->rmobile = $userObj->phone;
+    	$recharge->userid = $userObj->id;
+    	$recharge->rtype = 1;
+    	$recharge->rtitle = $remark;
+    	$recharge->rimage = $image;
+    	$recharge->rstate = 0;
+    	$recharge->rmoney = $money;
+    	$recharge->rpremoney = $money;
+    	$recharge->rbankname = $name;
+    	$recharge->raddtime = date("Y-m-d H:i:s");
+    	$recharge->rechcode = F::randStr(20, 'NUMBER');
+    	$recharge->save();
+        return F::buildJsonData(0, Consts::msgInfo());
+    }
+    
+    /*
+     *退出登录
+     */
+    public function actionLoginout(){
+    	$postData = isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
+        $json = json_decode($postData);
+        $return = self::baseValidate($json);
+    	if($return['code'] == 0){
+    		$userObj = $return['msg'];
+    	}else{
+    		return F::buildJsonData(1, Consts::msgInfo($return['code']));
+    	}
+    	$userObj->token = '';
+    	$userObj->save();
     	return F::buildJsonData(0, Consts::msgInfo());
     }
     
