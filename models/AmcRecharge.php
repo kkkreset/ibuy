@@ -39,8 +39,7 @@ class AmcRecharge extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['rid'], 'required'],
-            [['rid', 'rechcode', 'rtype', 'userid', 'rstate'], 'integer'],
+            [['rechcode', 'rtype', 'userid', 'rstate'], 'integer'],
             [['rmoney', 'rpremoney'], 'number'],
             [['rpasstime', 'raddtime'], 'safe'],
             [['rmobile'], 'string', 'max' => 11],

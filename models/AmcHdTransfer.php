@@ -38,7 +38,6 @@ class AmcHdTransfer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
             [['id', 'code', 'receiverid', 'payerid', 'accounttype', 'state'], 'integer'],
             [['premoney', 'money'], 'number'],
             [['addtime'], 'safe'],
