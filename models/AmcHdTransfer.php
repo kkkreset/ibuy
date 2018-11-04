@@ -32,6 +32,12 @@ class AmcHdTransfer extends \yii\db\ActiveRecord
         return 'amc_hd_transfer';
     }
 
+
+    public static function tableNameExp($exp)
+    {
+        return 'amc_hd_transfer '.$exp;
+    }
+
     /**
      * @inheritdoc
      */
@@ -46,6 +52,24 @@ class AmcHdTransfer extends \yii\db\ActiveRecord
             [['memo'], 'string', 'max' => 2000],
             [['id'], 'unique'],
         ];
+    }
+
+
+
+    public static function findAll($condition=[], $page=1, $pagesize=10) {
+        $query = AmcHdTransfer::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->where('payerid = '. $condition['payerid']);
+        $count = $query->count();
+        $query->orderBy('t.id desc');
+        $query->offset(0);
+        if($page > 1) {
+            $query->offset(($page - 1) * $pagesize);
+        }
+        $query->limit($pagesize);
+        $data = $query->all();
+        return compact('count', 'data');
     }
 
     /**
@@ -69,5 +93,14 @@ class AmcHdTransfer extends \yii\db\ActiveRecord
             'state' => 'State',
             'money' => 'Money',
         ];
+    }
+
+
+    public static function findByHd($id) {
+        $query = AmcHdTransfer::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->andWhere('id = '.$id);
+        return $query->one();
     }
 }

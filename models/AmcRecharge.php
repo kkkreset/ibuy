@@ -33,13 +33,19 @@ class AmcRecharge extends \yii\db\ActiveRecord
         return 'amc_recharge';
     }
 
+
+    public static function tableNameExp($exp)
+    {
+        return 'amc_recharge '.$exp;
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['rechcode', 'rtype', 'userid', 'rstate'], 'integer'],
+            [['rid', 'rechcode', 'rtype', 'userid', 'rstate'], 'integer'],
             [['rmoney', 'rpremoney'], 'number'],
             [['rpasstime', 'raddtime'], 'safe'],
             [['rmobile'], 'string', 'max' => 11],
@@ -70,5 +76,30 @@ class AmcRecharge extends \yii\db\ActiveRecord
             'rtitle' => 'Rtitle',
             'rstate' => 'Rstate',
         ];
+    }
+
+
+    public static function findAll($condition=[], $page=1, $pagesize=10) {
+        $query = AmcRecharge::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->where('userid = '. $condition['userid']);
+        $count = $query->count();
+        $query->orderBy('t.rid desc');
+        $query->offset(0);
+        if($page > 1) {
+            $query->offset(($page - 1) * $pagesize);
+        }
+        $query->limit($pagesize);
+        $data = $query->all();
+        return compact('count', 'data');
+    }
+
+    public static function findByCharge($id) {
+        $query = AmcRecharge::find();
+        $query->from(self::tableNameExp('t'));
+        $query->select('t.*');
+        $query->andWhere('rid = '.$id);
+        return $query->one();
     }
 }
