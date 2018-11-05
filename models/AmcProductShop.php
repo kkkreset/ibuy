@@ -80,6 +80,4 @@ class AmcProductShop extends \yii\db\ActiveRecord
         $data = $query->all();
         return compact('count', 'data');
     }
-
-    }
 }

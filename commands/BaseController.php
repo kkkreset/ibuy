@@ -30,28 +30,31 @@ class BaseController extends Controller {
      */
     public function beforeAction($action) {
         $postData =  isset($GLOBALS['HTTP_RAW_POST_DATA'])?$GLOBALS['HTTP_RAW_POST_DATA']:file_get_contents('php://input');
-        if(!$postData) {
-            return F::buildJsonData(1, Consts::msgInfo(3));exit;
+        if(empty($postData)) {
+            echo F::buildJsonData(3, Consts::msgInfo(3));exit;
         }
         $this->json = json_decode($postData);
+        if(empty($this->json)) {
+            echo F::buildJsonData(3, Consts::msgInfo(3));exit;
+        }
         if($action->id != 'signin') {
             $this->access_token = $this->json->access_token;
             $this->jData = isset($this->json->data)?$this->json->data:null;
             
-            if(!$this->access_token) {
-                return F::buildJsonData(41001, Consts::msgInfo(41001));exit;
+            if(empty($this->access_token)) {
+                echo F::buildJsonData(41001, Consts::msgInfo(41001));exit;
             }
             $this->token = F::parsingToken($this->access_token);
-            if(!$this->token) {
-                return F::buildJsonData(41002, Consts::msgInfo(41002));exit;
+            if(empty($this->token)) {
+                echo F::buildJsonData(41002, Consts::msgInfo(41002));exit;
             }
             $phone = $this->token->getClaim('phone');
             if(!$phone || $phone == ''){
-                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
+                echo F::buildJsonData(10022, Consts::msgInfo(10022));exit;
             }
             $this->user = AmcUser::findByPhone($phone);
-            if(!$this->user) {
-                return F::buildJsonData(10022, Consts::msgInfo(10022));exit;
+            if(empty($this->user)) {
+                echo F::buildJsonData(10022, Consts::msgInfo(10022));exit;
             }
         }
         return true;

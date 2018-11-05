@@ -12,17 +12,45 @@ use app\models\AmcProductShop;
 class ShopController extends BaseController{
 
 	public function actionList() {
-		// $dataObj = isset($this->jData)?$this->jData:'';
-		// $pid = isset($dataObj->pid)?$dataObj->pid: 0;
-		// $number = isset($dataObj->number)?$dataObj->number: 0;
+		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
+		$page = isset($dataObj->page)?$dataObj->page: 1;
+		$pageSize = isset($dataObj->pagesize)?$dataObj->pagesize: 10;
+		// $condition = empty($dataObj->condition)?[]:$dataObj->condition;
 
-		// AmcProductShop::findByAll();
+		$list = AmcProductShop::findByAll(['uid'=>$this->user->id], $page, $pagesize);
+		$dataArr = F::newModelToArr($list['data']);
+
+		$dataArr['nextPageNo'] = F::pages($list['count'], $page, $pageSize);
+		$dataArr['totalPages'] = $list['count'];
+
+		return F::buildJsonData(0, Consts::msgInfo(), $dataArr);
+	}
+
+	public function actionRemove() {
+		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
+		$id = isset($dataObj->id)?$dataObj->id: 1;
+
+		$shop = AmcProductShop::findOne($id);
+		if($shop->uid == $this->user->id) {
+			if($shop->delete() > 0) {
+				return F::buildJsonData(0, Consts::msgInfo());
+			}
+		}
 		return F::buildJsonData(3, Consts::msgInfo(3));
 	}
  
 
 	public function actionAdd() {
 		$dataObj = isset($this->jData)?$this->jData:'';
+		if(empty($dataObj)) {
+			return F::buildJsonData(10011, Consts::msgInfo(10011));
+		}
 		$pid = isset($dataObj->pid)?$dataObj->pid: 0;
 		$number = isset($dataObj->number)?$dataObj->number: 0;
 
