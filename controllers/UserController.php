@@ -255,9 +255,9 @@ class UserController extends BaseController{
             if($addr->errors) {
                 return F::buildJsonData(1,$addr->errors);
         	}
-        	$addr->save();
+        	$addr->id = $addr->save();
         }
-        return F::buildJsonData(0, Consts::msgInfo());
+        return F::buildJsonData(0, Consts::msgInfo(),$addr->toArray());
     }
     
     /*
